@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Desktop\\University\\2023\\Semester 1\\CAB301\\Assignment 3\\CAB301_Assignment3\\CAB301_Assignment3.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\University\\2023\\Semester 1\\CAB301\\Assignment 3\\C-Assignment3\\CAB301_Assignment3.csproj",
       "projectName": "CAB301_Assignment3",
-      "projectPath": "C:\\Users\\User\\Desktop\\University\\2023\\Semester 1\\CAB301\\Assignment 3\\CAB301_Assignment3\\CAB301_Assignment3.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\University\\2023\\Semester 1\\CAB301\\Assignment 3\\C-Assignment3\\CAB301_Assignment3.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Desktop\\University\\2023\\Semester 1\\CAB301\\Assignment 3\\CAB301_Assignment3\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\University\\2023\\Semester 1\\CAB301\\Assignment 3\\C-Assignment3\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
