@@ -11,7 +11,8 @@ namespace CAB301_Assignment3
         static void Main()
         {
             TaskManager taskManager = new TaskManager();
-            taskManager.Run();
+            Menu menu = new Menu(taskManager);
+            menu.Run();
 
         }
     }

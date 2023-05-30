@@ -9,79 +9,18 @@ namespace CAB301_Assignment3
     {
         private List<Task> tasks;
         private string inputFileName;
+        private TopologicalSorter sorter;
 
         public TaskManager()
         {
+            sorter = new TopologicalSorter();
             tasks = new List<Task>();
             inputFileName = "";
         }
 
-        public void Run()
+        public void LoadTasksFromFile()
         {
-            while (true)
-            {
-                Console.WriteLine("Project Management System");
-                Console.WriteLine("-------------------------");
-                Console.WriteLine("1. Load tasks from a file");
-                Console.WriteLine("2. Add a new task");
-                Console.WriteLine("3. Remove a task");
-                Console.WriteLine("4. Change task completion time");
-                Console.WriteLine("5. Save tasks to file");
-                Console.WriteLine("6. Find task sequence");
-                Console.WriteLine("7. Find earliest task times");
-                Console.WriteLine("8. Exit");
-                Console.WriteLine();
-
-                Console.Write("Enter your choice (1-8): ");
-                string choice = Console.ReadLine();
-
-                switch (choice)
-                {
-                    case "1":
-                        LoadTasksFromFile();
-                        Console.WriteLine("Tasks have been loaded from the file.");
-                        Console.WriteLine();
-                        break;
-                    case "2":
-                        AddNewTask();
-                        Console.WriteLine();
-                        break;
-                    case "3":
-                        RemoveTask();
-                        Console.WriteLine();
-                        break;
-                    case "4":
-                        ChangeTaskCompletionTime();
-                        Console.WriteLine("Task completion time has been changed.");
-                        Console.WriteLine();
-                        break;
-                    case "5":
-                        SaveTasksToFile();
-                        Console.WriteLine();
-                        break;
-                    case "6":
-                        FindTaskSequence();
-                        Console.WriteLine();
-                        break;
-                    case "7":
-                        FindEarliestTimes();
-                        Console.WriteLine();
-                        break;
-                    case "8":
-                        Environment.Exit(0);
-                        break;
-                    default:
-                        Console.WriteLine("Invalid choice. Please try again.");
-                        Console.WriteLine();
-                        break;
-                }
-            }
-        }
-        //ADD EXCLUDING BLAH BLAH
-
-        private void LoadTasksFromFile()
-        {
-            Console.Write("Enter the filename you would like to load: ");
+            Console.Write("Enter the filename you would like to load (Excluding File Extension e.g. .txt): ");
             string fileName = Console.ReadLine() + ".txt";
 
             try
@@ -109,7 +48,7 @@ namespace CAB301_Assignment3
             }
         }
 
-        private bool ParseTask(string line, out Task task)
+        public bool ParseTask(string line, out Task task)
         {
             task = null;
 
@@ -134,9 +73,9 @@ namespace CAB301_Assignment3
             return true;
         }
 
-        private void SaveTasksToFile()
+        public void SaveTasksToFile()
         {
-            Console.Write("Enter the filename you would like to save: ");
+            Console.Write("Enter the filename you would like to save (Excluding File Extension e.g. .txt): ");
             string fileName = Console.ReadLine() + ".txt";
 
             try
@@ -164,9 +103,9 @@ namespace CAB301_Assignment3
             }
         }
 
-        private void AddNewTask()
+        public void AddNewTask()
         {
-            Console.Write("Enter the task information (in the format 'T#, timetocomplete, dependencies'): ");
+            Console.Write("Enter the task information (in the format 'Task, timetocomplete, dependencies'): ");
             string input = Console.ReadLine();
 
             string[] taskData = input.Split(',');
@@ -200,9 +139,7 @@ namespace CAB301_Assignment3
         }
 
 
-
-
-        private void RemoveTask()
+        public void RemoveTask()
         {
             Console.Write("Enter the task ID to remove: ");
             string taskId = Console.ReadLine();
@@ -211,7 +148,7 @@ namespace CAB301_Assignment3
             if (taskToRemove != null)
             {
                 tasks.Remove(taskToRemove);
-                //Add "Task removed" line
+                Console.Write("Task Removed Successfully ");
             }
             else
             {
@@ -219,7 +156,7 @@ namespace CAB301_Assignment3
             }
         }
 
-        private void ChangeTaskCompletionTime()
+        public void ChangeTaskCompletionTime()
         {
             Console.Write("Enter the task ID to change completion time: ");
             string taskId = Console.ReadLine();
@@ -238,7 +175,7 @@ namespace CAB301_Assignment3
             }
         }
 
-        private void FindTaskSequence()
+        public void FindTaskSequence()
         {
             List<Task> sequence = new List<Task>();
             bool success = CheckCircularDependency(tasks, sequence);
@@ -260,7 +197,7 @@ namespace CAB301_Assignment3
                 return;
             }
 
-            string fileName = PromptFileName("Enter the filename to save the task sequence: ");
+            string fileName = PromptFileName("Enter the filename to save the task sequence (Excluding File Extension e.g. .txt): ");
             if (fileName != null)
             {
                 string fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".txt");
@@ -281,7 +218,7 @@ namespace CAB301_Assignment3
             }
         }
 
-        private bool CheckCircularDependency(List<Task> tasks, List<Task> sequence)
+        public bool CheckCircularDependency(List<Task> tasks, List<Task> sequence)
         {
             HashSet<Task> visited = new HashSet<Task>();
             HashSet<Task> completed = new HashSet<Task>();
@@ -298,7 +235,7 @@ namespace CAB301_Assignment3
             return true;
         }
 
-        private bool VisitTask(Task task, List<Task> sequence, HashSet<Task> visited, HashSet<Task> completed)
+        public bool VisitTask(Task task, List<Task> sequence, HashSet<Task> visited, HashSet<Task> completed)
         {
             if (completed.Contains(task))
             {
@@ -337,7 +274,7 @@ namespace CAB301_Assignment3
             return true;
         }
 
-        private void FindEarliestTimes()
+        public void FindEarliestTimes()
         {
             Dictionary<string, int> earliestTimes = new Dictionary<string, int>();
 
@@ -345,7 +282,7 @@ namespace CAB301_Assignment3
             Dictionary<string, Task> taskDictionary = tasks.ToDictionary(task => task.TaskId, task => task);
 
             // Perform topological sort to find the earliest times
-            List<Task> sortedTasks = TopologicalSort(tasks);
+            List<Task> sortedTasks = sorter.TopologicalSort(tasks);
             foreach (Task task in sortedTasks)
             {
                 VisitTaskEarliestTimes(task, earliestTimes, taskDictionary);
@@ -355,7 +292,7 @@ namespace CAB301_Assignment3
             var sortedEarliestTimes = earliestTimes.OrderBy(pair => pair.Key);
 
             // Save the earliest times to a file
-            Console.Write("Enter the filename to save the earliest times: ");
+            Console.Write("Enter the filename to save the earliest times (Excluding File Extension e.g. .txt): ");
             string fileName = Console.ReadLine();
             string fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".txt");
 
@@ -377,23 +314,23 @@ namespace CAB301_Assignment3
         }
 
 
-        private List<Task> TopologicalSort(List<Task> tasks)
-        {
-            List<Task> sortedTasks = new List<Task>();
-            HashSet<Task> visited = new HashSet<Task>();
-
-            foreach (Task task in tasks)
-            {
-                if (!visited.Contains(task))
+        /*        public List<Task> TopologicalSort(List<Task> tasks)
                 {
-                    VisitTaskForTopologicalSort(task, sortedTasks, visited);
-                }
-            }
+                    List<Task> sortedTasks = new List<Task>();
+                    HashSet<Task> visited = new HashSet<Task>();
 
-            return sortedTasks;
-        }
+                    foreach (Task task in tasks)
+                    {
+                        if (!visited.Contains(task))
+                        {
+                            VisitTaskForTopologicalSort(task, sortedTasks, visited);
+                        }
+                    }
 
-        private void VisitTaskForTopologicalSort(Task task, List<Task> sortedTasks, HashSet<Task> visited)
+                    return sortedTasks;
+                }*/
+
+        /*public void VisitTaskForTopologicalSort(Task task, List<Task> sortedTasks, HashSet<Task> visited)
         {
             visited.Add(task);
 
@@ -407,11 +344,10 @@ namespace CAB301_Assignment3
             }
 
             sortedTasks.Add(task);
-        }
+        }*/
 
 
-
-        private void VisitTaskEarliestTimes(Task task, Dictionary<string, int> earliestTimes, Dictionary<string, Task> taskDictionary)
+        public void VisitTaskEarliestTimes(Task task, Dictionary<string, int> earliestTimes, Dictionary<string, Task> taskDictionary)
         {
             if (!earliestTimes.ContainsKey(task.TaskId))
             {
@@ -438,7 +374,7 @@ namespace CAB301_Assignment3
         }
 
 
-        private string PromptFileName(string message)
+        public string PromptFileName(string message)
         {
             Console.Write(message);
             string fileName = Console.ReadLine();
