@@ -138,7 +138,6 @@ namespace CAB301_Assignment3
             Console.WriteLine("Task added successfully!");
         }
 
-
         public void RemoveTask()
         {
             Console.Write("Enter the task ID to remove: ");
@@ -285,7 +284,12 @@ namespace CAB301_Assignment3
             List<Task> sortedTasks = sorter.TopologicalSort(tasks);
             foreach (Task task in sortedTasks)
             {
-                VisitTaskEarliestTimes(task, earliestTimes, taskDictionary);
+                bool success = VisitTaskEarliestTimes(task, earliestTimes, taskDictionary, new HashSet<string>());
+                if (!success)
+                {
+                    Console.WriteLine("Error: Circular dependency detected.");
+                    return;
+                }
             }
 
             // Sort the earliest times by the task ID
@@ -313,42 +317,15 @@ namespace CAB301_Assignment3
             }
         }
 
-
-        /*        public List<Task> TopologicalSort(List<Task> tasks)
-                {
-                    List<Task> sortedTasks = new List<Task>();
-                    HashSet<Task> visited = new HashSet<Task>();
-
-                    foreach (Task task in tasks)
-                    {
-                        if (!visited.Contains(task))
-                        {
-                            VisitTaskForTopologicalSort(task, sortedTasks, visited);
-                        }
-                    }
-
-                    return sortedTasks;
-                }*/
-
-        /*public void VisitTaskForTopologicalSort(Task task, List<Task> sortedTasks, HashSet<Task> visited)
+        public bool VisitTaskEarliestTimes(Task task, Dictionary<string, int> earliestTimes, Dictionary<string, Task> taskDictionary, HashSet<string> visited)
         {
-            visited.Add(task);
-
-            foreach (string dependency in task.Dependencies)
+            if (visited.Contains(task.TaskId))
             {
-                Task dependentTask = tasks.Find(t => t.TaskId == dependency);
-                if (dependentTask != null && !visited.Contains(dependentTask))
-                {
-                    VisitTaskForTopologicalSort(dependentTask, sortedTasks, visited);
-                }
+                return false; // Circular dependency detected
             }
 
-            sortedTasks.Add(task);
-        }*/
+            visited.Add(task.TaskId);
 
-
-        public void VisitTaskEarliestTimes(Task task, Dictionary<string, int> earliestTimes, Dictionary<string, Task> taskDictionary)
-        {
             if (!earliestTimes.ContainsKey(task.TaskId))
             {
                 // Find the earliest times of the task dependencies
@@ -358,12 +335,22 @@ namespace CAB301_Assignment3
                     if (taskDictionary.ContainsKey(dependency))
                     {
                         Task dependentTask = taskDictionary[dependency];
-                        VisitTaskEarliestTimes(dependentTask, earliestTimes, taskDictionary);
+                        bool success = VisitTaskEarliestTimes(dependentTask, earliestTimes, taskDictionary, visited);
+                        if (!success)
+                        {
+                            return false; // Propagate circular dependency detection
+                        }
+
                         if (earliestTimes.ContainsKey(dependency))
                         {
                             int dependencyTime = earliestTimes[dependency] + dependentTask.TimeNeeded;
                             maxDependencyTime = Math.Max(maxDependencyTime, dependencyTime);
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Dependency not found for task " + dependency);
+                        return false;
                     }
                 }
 
@@ -371,6 +358,10 @@ namespace CAB301_Assignment3
                 int earliestTime = maxDependencyTime;
                 earliestTimes[task.TaskId] = earliestTime;
             }
+
+            visited.Remove(task.TaskId);
+
+            return true;
         }
 
 
