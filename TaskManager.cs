@@ -147,6 +147,13 @@ namespace CAB301_Assignment3
             if (taskToRemove != null)
             {
                 tasks.Remove(taskToRemove);
+
+                // Remove the task from dependencies of other tasks
+                foreach (Task task in tasks)
+                {
+                    task.Dependencies.Remove(taskId);
+                }
+
                 Console.Write("Task Removed Successfully ");
             }
             else
